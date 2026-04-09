@@ -1,16 +1,17 @@
 import "./globals.css";
 
-import { Geist_Mono, Inter } from "next/font/google";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
-const fontMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-});
+export const metadata: Metadata = {
+  title: "Online Assessment Platform",
+  description: "Online Assessment Platform",
+};
 
 export default function RootLayout({
   children,
@@ -21,12 +22,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn(
-        "antialiased",
-        fontMono.variable,
-        "font-sans",
-        inter.variable
-      )}
+      className={cn("antialiased", inter.variable)}
     >
       <body>
         <ThemeProvider>{children}</ThemeProvider>

@@ -35,4 +35,7 @@ pnpm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 
+.cursor
+
+/PLAN.md
 /public/project-task.pdf
