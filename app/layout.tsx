@@ -25,7 +25,7 @@ export default function RootLayout({
         <ThemeProvider>
           <Header />
 
-          <main>{children}</main>
+          <main className="bg-[#F7F8F9] dark:bg-background">{children}</main>
 
           <Footer />
         </ThemeProvider>

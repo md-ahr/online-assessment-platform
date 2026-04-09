@@ -1,7 +1,16 @@
+import type { Metadata } from "next";
+
+import { LoginForm } from "@/components/auth/login-form";
+
+export const metadata: Metadata = {
+  title: "Sign In",
+  description: "Sign in to the Online Assessment Platform",
+};
+
 export default function LoginPage() {
   return (
-    <section className="grid h-[calc(100vh-161px)] place-items-center">
-      <h1 className="subtitle m-8">Login</h1>
+    <section className="flex min-h-[calc(100vh-161px)] items-center justify-center">
+      <LoginForm />
     </section>
   );
 }

@@ -62,7 +62,7 @@ export function Header() {
                   "dark:text-white/95 dark:hover:text-white",
                   "dark:focus-visible:ring-white/35"
                 )}
-                href="/"
+                href="/dashboard"
               >
                 Dashboard
               </Link>
