@@ -118,34 +118,49 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   html {
     scroll-behavior: smooth;
+
+    &.light .app-header {
+      box-shadow:
+        0 79px 128px rgba(192, 192, 192, 0.09),
+        0 28.8363px 46.7221px rgba(192, 192, 192, 0.0598508),
+        0 13.9995px 22.6827px rgba(192, 192, 192, 0.0475723),
+        0 6.86281px 11.1195px rgba(192, 192, 192, 0.0380675),
+        0 2.71357px 4.39666px rgba(192, 192, 192, 0.0270615);
+    }
   }
+
   body {
     @apply bg-background text-foreground;
+
+    .container-wrapper {
+      @apply mx-auto max-w-[90%] sm:max-w-[94%] lg:max-w-[91.70%];
+    }
 
     button {
       @apply cursor-pointer;
     }
+
+    .title {
+      @apply text-2xl leading-[130%] font-semibold text-secondary dark:text-primary-foreground;
+    }
+
+    .subtitle {
+      @apply text-xl leading-[140%] font-semibold text-secondary dark:text-primary-foreground;
+    }
+
+    .body {
+      @apply text-base leading-[150%] font-normal;
+    }
+
+    .small {
+      @apply text-sm leading-[150%] font-normal;
+    }
+
+    .xs {
+      @apply text-xs leading-[160%] font-normal;
+    }
   }
-}
-
-.title {
-  @apply text-2xl leading-[130%] font-semibold text-secondary dark:text-primary-foreground;
-}
-
-.subtitle {
-  @apply text-xl leading-[140%] font-semibold text-secondary dark:text-primary-foreground;
-}
-
-.body {
-  @apply text-base leading-[150%] font-normal;
-}
-
-.small {
-  @apply text-sm leading-[150%] font-normal;
-}
-
-.xs {
-  @apply text-xs leading-[160%] font-normal;
 }
