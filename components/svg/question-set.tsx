@@ -1,8 +1,8 @@
 import type { SVGProps } from "react";
 
 export function QuestionSet({
-  width = 18,
-  height = 22,
+  width = 24,
+  height = 24,
   stroke = "#9CA3AF",
   strokeWidth = "1.5",
   ...props
