@@ -6,7 +6,7 @@ import * as React from "react";
 function ThemeProvider({
   children,
   ...props
-}: React.ComponentProps<typeof NextThemesProvider>) {
+}: Readonly<React.ComponentProps<typeof NextThemesProvider>>) {
   return (
     <NextThemesProvider
       attribute="class"
@@ -47,7 +47,9 @@ function ThemeHotkey() {
         return;
       }
 
-      if (event.key.toLowerCase() !== "d") {
+      const key = typeof event.key === "string" ? event.key : "";
+
+      if (key.toLowerCase() !== "d") {
         return;
       }
 

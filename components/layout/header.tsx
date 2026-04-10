@@ -1,6 +1,5 @@
 import { ChevronDown } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 
 import { User } from "@/components/svg/user";
 import { Button } from "@/components/ui/button";
@@ -51,23 +50,7 @@ export function Header() {
             />
           </span>
 
-          <nav aria-label="Main">
-            {isLoggedIn && (
-              <Link
-                className={cn(
-                  "inline-flex items-center justify-center rounded-full px-0 py-2",
-                  "text-base leading-[140%] font-normal text-[#130B2C]",
-                  "transition-colors hover:text-[#130B2C]/85",
-                  "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none",
-                  "dark:text-white/95 dark:hover:text-white",
-                  "dark:focus-visible:ring-white/35"
-                )}
-                href="/dashboard"
-              >
-                Dashboard
-              </Link>
-            )}
-          </nav>
+          <nav aria-label="Main">{isLoggedIn && <p>Dashboard</p>}</nav>
         </div>
 
         {!isLoggedIn && <h1 className="title mx-auto">Akij Resource</h1>}
