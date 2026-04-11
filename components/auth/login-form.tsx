@@ -35,7 +35,20 @@ const inputClassName = cn(
 const labelClassName =
   "text-sm font-medium leading-[150%] text-[#334155] dark:text-foreground";
 
-export function LoginForm() {
+export type SeedAccountCredentials = {
+  email: string;
+  password: string;
+  userId: string;
+};
+
+export type LoginFormProps = {
+  seedCredentials?: {
+    employer: SeedAccountCredentials;
+    candidate: SeedAccountCredentials;
+  };
+};
+
+export function LoginForm({ seedCredentials }: LoginFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
@@ -160,6 +173,121 @@ export function LoginForm() {
           </form>
         </Form>
       </div>
+
+      {seedCredentials ? (
+        <aside
+          aria-label="Demo login credentials"
+          className={cn(
+            "rounded-2xl border border-dashed border-[#C4B5FD] bg-[#F5F3FF] p-5",
+            "dark:border-[#6633FF]/40 dark:bg-[#6633FF]/10"
+          )}
+        >
+          <h2 className="text-base font-semibold text-[#334155] dark:text-foreground">
+            Demo credentials
+          </h2>
+          <ul className="mt-3 flex justify-between gap-4">
+            <li
+              className={cn(
+                "w-full rounded-xl border border-[#E5E7EB] bg-white p-4",
+                "dark:border-border dark:bg-card"
+              )}
+            >
+              <p className="text-sm font-semibold text-[#334155] dark:text-foreground">
+                Employer
+              </p>
+              <dl className="mt-2 space-y-1 text-sm text-[#64748B] dark:text-muted-foreground">
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="font-medium text-[#334155] dark:text-foreground">
+                    Email
+                  </dt>
+                  <dd className="break-all">
+                    {seedCredentials.employer.email}
+                  </dd>
+                </div>
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="font-medium text-[#334155] dark:text-foreground">
+                    User ID
+                  </dt>
+                  <dd>{seedCredentials.employer.userId}</dd>
+                </div>
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="font-medium text-[#334155] dark:text-foreground">
+                    Password
+                  </dt>
+                  <dd className="font-mono text-xs break-all">
+                    {seedCredentials.employer.password}
+                  </dd>
+                </div>
+              </dl>
+              <Button
+                className="mt-3 h-9 rounded-lg border border-[#6633FF] bg-white text-sm font-medium text-[#6633FF] hover:bg-[#6633FF]/5 dark:border-[#6633FF] dark:bg-transparent dark:text-[#a78bfa] dark:hover:bg-[#6633FF]/15"
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  form.setValue(
+                    "emailOrUserId",
+                    seedCredentials.employer.email
+                  );
+                  form.setValue("password", seedCredentials.employer.password);
+                }}
+              >
+                Use account
+              </Button>
+            </li>
+
+            <li
+              className={cn(
+                "w-full rounded-xl border border-[#E5E7EB] bg-white p-4",
+                "dark:border-border dark:bg-card"
+              )}
+            >
+              <p className="text-sm font-semibold text-[#334155] dark:text-foreground">
+                Candidate
+              </p>
+              <dl className="mt-2 space-y-1 text-sm text-[#64748B] dark:text-muted-foreground">
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="font-medium text-[#334155] dark:text-foreground">
+                    Email
+                  </dt>
+                  <dd className="break-all">
+                    {seedCredentials.candidate.email}
+                  </dd>
+                </div>
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="font-medium text-[#334155] dark:text-foreground">
+                    User ID
+                  </dt>
+                  <dd>{seedCredentials.candidate.userId}</dd>
+                </div>
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="font-medium text-[#334155] dark:text-foreground">
+                    Password
+                  </dt>
+                  <dd className="font-mono text-xs break-all">
+                    {seedCredentials.candidate.password}
+                  </dd>
+                </div>
+              </dl>
+              <Button
+                className="mt-3 h-9 rounded-lg border border-[#6633FF] bg-white text-sm font-medium text-[#6633FF] hover:bg-[#6633FF]/5 dark:border-[#6633FF] dark:bg-transparent dark:text-[#a78bfa] dark:hover:bg-[#6633FF]/15"
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  form.setValue(
+                    "emailOrUserId",
+                    seedCredentials.candidate.email
+                  );
+                  form.setValue("password", seedCredentials.candidate.password);
+                }}
+              >
+                Use account
+              </Button>
+            </li>
+          </ul>
+        </aside>
+      ) : null}
     </div>
   );
 }
