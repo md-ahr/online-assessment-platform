@@ -13,8 +13,8 @@ export type DeleteOnlineTestResult = Readonly<{
 export async function deleteOnlineTestAction(
   testId: string
 ): Promise<DeleteOnlineTestResult> {
-  const session = await requireEmployerSession();
-  const deleted = await deleteOnlineTest(session.userId, testId);
+  await requireEmployerSession();
+  const deleted = await deleteOnlineTest(testId);
 
   if (!deleted) {
     return {

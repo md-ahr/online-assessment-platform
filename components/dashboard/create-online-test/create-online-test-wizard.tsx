@@ -18,6 +18,7 @@ export function CreateOnlineTestWizard({
   onSubmit,
   submitLabel,
   initialValues,
+  mode = "create",
 }: CreateOnlineTestWizardProps) {
   const [isSubmitting, startTransition] = useTransition();
 
@@ -44,6 +45,7 @@ export function CreateOnlineTestWizard({
   } = useCreateOnlineTestWizard({
     initialQuestions,
     initialValues,
+    mode,
   });
 
   function handleSaveOnlineTest() {

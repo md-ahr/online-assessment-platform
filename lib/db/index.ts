@@ -5,6 +5,8 @@ export {
   createOnlineTest,
   deleteOnlineTest,
   getOnlineTestById,
+  getOnlineTestTitleById,
   listOnlineTests,
+  listOnlineTestsForCandidates,
   updateOnlineTest,
 } from "./online-tests.repository";

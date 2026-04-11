@@ -12,18 +12,47 @@ import type { QuestionDraft } from "../question-editor.types";
 type UseCreateOnlineTestWizardParams = Readonly<{
   initialQuestions?: readonly QuestionDraft[];
   initialValues?: Partial<OnlineTestFormValues>;
+  mode?: "create" | "edit";
 }>;
+
+function getWizardBootstrap(
+  mode: "create" | "edit" | undefined,
+  initialValues: Partial<OnlineTestFormValues> | undefined
+): {
+  basicInfoView: "form" | "summary";
+  savedValues: OnlineTestFormValues | null;
+  step: WizardStep;
+} {
+  if (mode !== "edit" || !initialValues) {
+    return { basicInfoView: "form", savedValues: null, step: 1 };
+  }
+
+  const parsed = basicInfoSchema.safeParse(initialValues);
+
+  if (!parsed.success) {
+    return { basicInfoView: "form", savedValues: null, step: 1 };
+  }
+
+  return {
+    basicInfoView: "summary",
+    savedValues: parsed.data,
+    step: 2,
+  };
+}
 
 export function useCreateOnlineTestWizard({
   initialQuestions,
   initialValues,
+  mode,
 }: UseCreateOnlineTestWizardParams) {
-  const [step, setStep] = useState<WizardStep>(1);
+  const [step, setStep] = useState<WizardStep>(
+    () => getWizardBootstrap(mode, initialValues).step
+  );
   const [basicInfoView, setBasicInfoView] = useState<"form" | "summary">(
-    "form"
+    () => getWizardBootstrap(mode, initialValues).basicInfoView
   );
   const [savedValues, setSavedValues] = useState<OnlineTestFormValues | null>(
-    null
+    () => getWizardBootstrap(mode, initialValues).savedValues
   );
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
   const [questions, setQuestions] = useState<QuestionDraft[]>(() => [

@@ -2,6 +2,7 @@
 
 import { Laptop, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useSyncExternalStore } from "react";
 
 import {
   Select,
@@ -43,11 +44,48 @@ function ThemeOptionIcon({ theme }: Readonly<{ theme: ThemeOption }>) {
   return <Laptop aria-hidden className="size-4" />;
 }
 
+let didCommitClientRender = false;
+const clientRenderListeners = new Set<() => void>();
+
+function subscribeToClientRender(onStoreChange: () => void) {
+  clientRenderListeners.add(onStoreChange);
+
+  queueMicrotask(() => {
+    if (didCommitClientRender) {
+      return;
+    }
+
+    didCommitClientRender = true;
+
+    for (const listener of clientRenderListeners) {
+      listener();
+    }
+  });
+
+  return () => {
+    clientRenderListeners.delete(onStoreChange);
+  };
+}
+
+function getClientHasRenderedSnapshot() {
+  return didCommitClientRender;
+}
+
+function getServerHasRenderedSnapshot() {
+  return false;
+}
+
 export function ThemeSwitcher() {
   const { setTheme, theme } = useTheme();
+  const hasRenderedOnClient = useSyncExternalStore(
+    subscribeToClientRender,
+    getClientHasRenderedSnapshot,
+    getServerHasRenderedSnapshot
+  );
 
   const selectedTheme: ThemeOption =
-    theme === "light" || theme === "dark" || theme === "system"
+    hasRenderedOnClient &&
+    (theme === "light" || theme === "dark" || theme === "system")
       ? theme
       : "system";
 

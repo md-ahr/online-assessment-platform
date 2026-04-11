@@ -137,13 +137,9 @@ export async function updateOnlineTestAction(
   payload: UpsertOnlineTestPayload
 ): Promise<UpsertOnlineTestResult> {
   try {
-    const session = await requireEmployerSession();
+    await requireEmployerSession();
     const mutationInput = toMutationInput(payload);
-    const updated = await updateOnlineTest(
-      session.userId,
-      testId,
-      mutationInput
-    );
+    const updated = await updateOnlineTest(testId, mutationInput);
 
     if (!updated) {
       return {

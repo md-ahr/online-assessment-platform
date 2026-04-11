@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
 
-import { logoutAction } from "@/app/auth/login/actions";
+import { logoutAction } from "@/app/(public)/auth/login/actions";
 import { User } from "@/components/svg/user";
 import {
   Popover,
@@ -31,7 +31,13 @@ export function Header() {
 
   const isLoggedIn = !pathname.startsWith("/auth");
 
-  const isOverviewPage = pathname === "/dashboard";
+  const isEmployerDashboard = pathname === "/dashboard";
+  const isCandidateHome = pathname === "/candidate";
+  const homeHref = !isLoggedIn
+    ? "/auth/login"
+    : pathname.startsWith("/candidate")
+      ? "/candidate"
+      : "/dashboard";
 
   return (
     <header
@@ -49,7 +55,7 @@ export function Header() {
           )}
         >
           <Link
-            href={isLoggedIn ? "/dashboard" : "/auth/login"}
+            href={homeHref}
             className="relative inline-block h-8 w-[116px] shrink-0"
           >
             <Image
@@ -73,7 +79,13 @@ export function Header() {
 
           <nav aria-label="Main">
             {isLoggedIn && (
-              <p>{isOverviewPage ? "Dashboard" : "Online Test"}</p>
+              <p>
+                {isEmployerDashboard
+                  ? "Dashboard"
+                  : isCandidateHome
+                    ? "Online Tests"
+                    : "Online Test"}
+              </p>
             )}
           </nav>
         </div>

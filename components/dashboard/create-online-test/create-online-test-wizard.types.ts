@@ -26,6 +26,8 @@ export type CreateOnlineTestWizardProps = Readonly<{
     success: boolean;
   }>;
   initialValues?: Partial<OnlineTestFormValues>;
+  /** When `"edit"`, wizard opens on the questions step with basic info pre-saved. */
+  mode?: "create" | "edit";
   submitLabel?: string;
 }>;
 

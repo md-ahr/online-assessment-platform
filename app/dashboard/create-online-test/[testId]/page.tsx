@@ -19,9 +19,9 @@ type EditOnlineTestPageProps = Readonly<{
 export default async function EditOnlineTestPage({
   params,
 }: EditOnlineTestPageProps) {
-  const session = await requireEmployerSession();
+  await requireEmployerSession();
   const { testId } = await params;
-  const testRecord = await getOnlineTestById(session.userId, testId);
+  const testRecord = await getOnlineTestById(testId);
 
   if (!testRecord) {
     notFound();

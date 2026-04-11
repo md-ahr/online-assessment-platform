@@ -30,6 +30,7 @@ export function CreateOnlineTest({
     <CreateOnlineTestWizard
       initialQuestions={initialQuestions}
       initialValues={initialValues}
+      mode={mode}
       submitLabel={mode === "edit" ? "Update Online Test" : "Save Online Test"}
       onCancel={() => router.push("/dashboard")}
       onSubmit={(payload) => {

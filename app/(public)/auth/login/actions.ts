@@ -13,6 +13,7 @@ import type { UserRole } from "@/lib/db/types";
 export type LoginActionResult = Readonly<{
   success: boolean;
   message: string;
+  redirectTo?: string;
 }>;
 
 const INVALID_CREDENTIALS_MESSAGE = "Invalid email/User ID or password";
@@ -39,7 +40,6 @@ export async function loginAction(
   const normalizedEmail = identifier.toLowerCase();
 
   const user = await UserModel.findOne({
-    role: "employer",
     $or: [{ email: normalizedEmail }, { userId: identifier }],
   }).lean();
 
@@ -79,6 +79,7 @@ export async function loginAction(
   return {
     success: true,
     message: "Login successful",
+    redirectTo: user.role === "candidate" ? "/candidate" : "/dashboard",
   };
 }
 

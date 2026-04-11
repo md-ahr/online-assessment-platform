@@ -8,7 +8,7 @@ import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { loginAction } from "@/app/auth/login/actions";
+import { loginAction } from "@/app/(public)/auth/login/actions";
 import {
   type LoginFormValues,
   loginSchema,
@@ -58,7 +58,7 @@ export function LoginForm() {
       }
 
       toast.success(result.message);
-      router.replace("/dashboard");
+      router.replace(result.redirectTo ?? "/dashboard");
       router.refresh();
     });
   }

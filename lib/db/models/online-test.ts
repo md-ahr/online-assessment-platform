@@ -45,6 +45,8 @@ const onlineTestSchema = new Schema(
     startTime: { type: String, required: true, trim: true },
     endTime: { type: String, required: true, trim: true },
     durationMinutes: { type: Number, default: null, min: 0 },
+    /** Penalty per wrong answer. Use 0 for no negative marking; default -0.25. */
+    negativeMarkPerWrong: { type: Number, default: -0.25 },
     questions: { type: [questionSchema], default: [] },
     createdBy: {
       type: Schema.Types.ObjectId,

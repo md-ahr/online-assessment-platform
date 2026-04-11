@@ -1,30 +1,30 @@
 import type { Metadata } from "next";
 
-import { OnlineTestsDashboard } from "@/components/dashboard/overview";
-import { requireEmployerSession } from "@/lib/auth/guards";
-import { listOnlineTests } from "@/lib/db";
+import { CandidateTestsOverview } from "@/components/candidate/overview";
+import { requireCandidateSession } from "@/lib/auth/guards";
+import { listOnlineTestsForCandidates } from "@/lib/db";
 
-import { type DashboardSearchParams, parsePositiveInt } from "./search-params";
+import { type CandidateSearchParams, parsePositiveInt } from "./search-params";
 
 export const metadata: Metadata = {
   title: "Online Tests",
-  description: "Manage online tests and candidates",
+  description: "Browse and start available online assessments",
 };
 
-type DashboardPageProps = Readonly<{
-  searchParams: Promise<DashboardSearchParams>;
+type CandidatePageProps = Readonly<{
+  searchParams: Promise<CandidateSearchParams>;
 }>;
 
-export default async function DashboardPage({
+export default async function CandidatePage({
   searchParams,
-}: DashboardPageProps) {
-  await requireEmployerSession();
+}: CandidatePageProps) {
+  await requireCandidateSession();
   const params = await searchParams;
   const page = parsePositiveInt(params.page, 1);
   const pageSize = parsePositiveInt(params.pageSize, 8);
   const query = params.q?.trim() ?? "";
 
-  const data = await listOnlineTests({
+  const data = await listOnlineTestsForCandidates({
     page,
     pageSize,
     query,
@@ -32,7 +32,7 @@ export default async function DashboardPage({
 
   return (
     <section className="container-wrapper min-h-[calc(100vh-161px)] py-8 pb-12 dark:bg-background">
-      <OnlineTestsDashboard
+      <CandidateTestsOverview
         items={data.items}
         page={data.page}
         pageSize={data.pageSize}

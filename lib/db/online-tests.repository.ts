@@ -3,6 +3,7 @@ import "server-only";
 import { Types } from "mongoose";
 
 import type {
+  OnlineTestCandidateListItem,
   OnlineTestDashboardItem,
   OnlineTestMutationInput,
   QuestionDTO,
@@ -11,8 +12,10 @@ import type {
 import { OnlineTestModel } from "./models/online-test";
 import { connectToDatabase } from "./mongoose";
 
+/** Default penalty shown to candidates when the field is unset (matches product spec). */
+export const DEFAULT_NEGATIVE_MARK_PER_WRONG = -0.25;
+
 export type ListOnlineTestsParams = Readonly<{
-  userId: string;
   page: number;
   pageSize: number;
   query: string;
@@ -20,6 +23,20 @@ export type ListOnlineTestsParams = Readonly<{
 
 export type ListOnlineTestsResult = Readonly<{
   items: readonly OnlineTestDashboardItem[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}>;
+
+export type ListOnlineTestsForCandidatesParams = Readonly<{
+  page: number;
+  pageSize: number;
+  query: string;
+}>;
+
+export type ListOnlineTestsForCandidatesResult = Readonly<{
+  items: readonly OnlineTestCandidateListItem[];
   page: number;
   pageSize: number;
   total: number;
@@ -71,29 +88,30 @@ export async function listOnlineTests(
 ): Promise<ListOnlineTestsResult> {
   await connectToDatabase();
 
-  const { page, pageSize } = normalizePagination(params.page, params.pageSize);
-  const ownerObjectId = toObjectId(params.userId);
+  const { page: initialPage, pageSize } = normalizePagination(
+    params.page,
+    params.pageSize
+  );
+  let page = initialPage;
   const trimmedQuery = params.query.trim();
-  const filter = {
-    createdBy: ownerObjectId,
-    ...(trimmedQuery
-      ? {
-          title: {
-            $regex: escapeRegExp(trimmedQuery),
-            $options: "i",
-          },
-        }
-      : {}),
-  };
+  const filter = trimmedQuery
+    ? {
+        title: {
+          $regex: escapeRegExp(trimmedQuery),
+          $options: "i",
+        },
+      }
+    : {};
 
-  const [records, total] = await Promise.all([
-    OnlineTestModel.find(filter)
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * pageSize)
-      .limit(pageSize)
-      .lean(),
-    OnlineTestModel.countDocuments(filter),
-  ]);
+  const total = await OnlineTestModel.countDocuments(filter);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  page = Math.min(page, totalPages);
+
+  const records = await OnlineTestModel.find(filter)
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * pageSize)
+    .limit(pageSize)
+    .lean();
 
   const items: OnlineTestDashboardItem[] = records.map((record) => ({
     id: record._id.toString(),
@@ -108,8 +126,78 @@ export async function listOnlineTests(
     page,
     pageSize,
     total,
-    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+    totalPages,
   };
+}
+
+export async function listOnlineTestsForCandidates(
+  params: ListOnlineTestsForCandidatesParams
+): Promise<ListOnlineTestsForCandidatesResult> {
+  await connectToDatabase();
+
+  const { page: initialPage, pageSize } = normalizePagination(
+    params.page,
+    params.pageSize
+  );
+  let page = initialPage;
+  const trimmedQuery = params.query.trim();
+  const filter = trimmedQuery
+    ? {
+        title: {
+          $regex: escapeRegExp(trimmedQuery),
+          $options: "i",
+        },
+      }
+    : {};
+
+  const total = await OnlineTestModel.countDocuments(filter);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  page = Math.min(page, totalPages);
+
+  const records = await OnlineTestModel.find(filter)
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * pageSize)
+    .limit(pageSize)
+    .lean();
+
+  const items: OnlineTestCandidateListItem[] = records.map((record) => {
+    const embeddedCount = record.questions?.length ?? 0;
+    const questionCount =
+      embeddedCount > 0 ? embeddedCount : record.totalQuestionSet;
+
+    return {
+      durationMinutes: record.durationMinutes ?? null,
+      id: record._id.toString(),
+      negativeMarkPerWrong:
+        record.negativeMarkPerWrong ?? DEFAULT_NEGATIVE_MARK_PER_WRONG,
+      questionCount,
+      title: record.title,
+    };
+  });
+
+  return {
+    items,
+    page,
+    pageSize,
+    total,
+    totalPages,
+  };
+}
+
+export async function getOnlineTestTitleById(
+  testId: string
+): Promise<string | null> {
+  await connectToDatabase();
+
+  if (!Types.ObjectId.isValid(testId)) {
+    return null;
+  }
+
+  const record = await OnlineTestModel.findById(toObjectId(testId))
+    .select({ title: 1 })
+    .lean();
+
+  return record?.title ?? null;
 }
 
 export async function createOnlineTest(
@@ -122,6 +210,7 @@ export async function createOnlineTest(
     createdBy: toObjectId(userId),
     durationMinutes: input.durationMinutes,
     endTime: input.endTime,
+    negativeMarkPerWrong: DEFAULT_NEGATIVE_MARK_PER_WRONG,
     questionType: input.questionType,
     questions: input.questions.map((question) => ({
       options: question.options.map((option) => ({ ...option })),
@@ -142,15 +231,11 @@ export async function createOnlineTest(
 }
 
 export async function getOnlineTestById(
-  userId: string,
   testId: string
 ): Promise<EditableOnlineTestRecord | null> {
   await connectToDatabase();
 
-  const record = await OnlineTestModel.findOne({
-    _id: toObjectId(testId),
-    createdBy: toObjectId(userId),
-  }).lean();
+  const record = await OnlineTestModel.findById(toObjectId(testId)).lean();
 
   if (!record) {
     return null;
@@ -171,7 +256,6 @@ export async function getOnlineTestById(
 }
 
 export async function updateOnlineTest(
-  userId: string,
   testId: string,
   input: OnlineTestMutationInput
 ): Promise<boolean> {
@@ -180,12 +264,12 @@ export async function updateOnlineTest(
   const updated = await OnlineTestModel.updateOne(
     {
       _id: toObjectId(testId),
-      createdBy: toObjectId(userId),
     },
     {
       $set: {
         durationMinutes: input.durationMinutes,
         endTime: input.endTime,
+        negativeMarkPerWrong: DEFAULT_NEGATIVE_MARK_PER_WRONG,
         questionType: input.questionType,
         questions: input.questions.map((question) => ({
           options: question.options.map((option) => ({ ...option })),
@@ -205,15 +289,11 @@ export async function updateOnlineTest(
   return updated.matchedCount > 0;
 }
 
-export async function deleteOnlineTest(
-  userId: string,
-  testId: string
-): Promise<boolean> {
+export async function deleteOnlineTest(testId: string): Promise<boolean> {
   await connectToDatabase();
 
   const deleted = await OnlineTestModel.deleteOne({
     _id: toObjectId(testId),
-    createdBy: toObjectId(userId),
   });
 
   return deleted.deletedCount > 0;

@@ -25,6 +25,16 @@ export type OnlineTestDashboardItem = Readonly<{
   examSlots: number;
 }>;
 
+/** Public catalog row for candidates (no employer-only fields). */
+export type OnlineTestCandidateListItem = Readonly<{
+  id: string;
+  title: string;
+  durationMinutes: number | null;
+  questionCount: number;
+  /** 0 = no negative marking; otherwise penalty per wrong (e.g. -0.25). */
+  negativeMarkPerWrong: number;
+}>;
+
 export type OnlineTestMutationInput = Readonly<{
   title: string;
   totalCandidates: number;
