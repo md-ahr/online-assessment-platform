@@ -78,9 +78,9 @@ export function Header({ session }: HeaderProps) {
         "dark:border-white/8 dark:bg-neutral-900"
       )}
     >
-      <div className="container-wrapper flex h-20 min-h-20 w-full items-center gap-2 sm:gap-4">
+      <div className="container-wrapper w-full">
         {isLoggedIn ? (
-          <>
+          <div className="flex h-20 min-h-20 items-center gap-2 sm:gap-4">
             <HeaderLogoLink href={homeHref} />
             <nav
               aria-label="Main"
@@ -91,7 +91,6 @@ export function Header({ session }: HeaderProps) {
               </p>
             </nav>
             <div className="flex shrink-0 items-center gap-1.5 sm:gap-4">
-              <ThemeSwitcher />
               <Popover>
                 <PopoverTrigger
                   className={cn(
@@ -159,14 +158,17 @@ export function Header({ session }: HeaderProps) {
                 </PopoverContent>
               </Popover>
             </div>
-          </>
+          </div>
         ) : (
-          <>
+          <div className="flex h-20 min-h-20 items-center justify-between gap-2">
             <HeaderLogoLink href={homeHref} />
-            <h1 className="title min-w-0 flex-1 px-2 text-center">
+            <h1 className="title hidden min-w-0 flex-1 px-2 text-center sm:block">
               Akij Resource
             </h1>
-          </>
+            <div className="text-right">
+              <ThemeSwitcher />
+            </div>
+          </div>
         )}
       </div>
     </header>
