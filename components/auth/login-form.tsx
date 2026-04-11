@@ -4,10 +4,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod/v4";
+import { toast } from "sonner";
 
+import { loginAction } from "@/app/auth/login/actions";
+import {
+  type LoginFormValues,
+  loginSchema,
+} from "@/components/auth/login.schema";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -19,26 +24,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-
-const loginSchema = z.object({
-  emailOrUserId: z
-    .string()
-    .trim()
-    .min(1, { message: "Enter your email or User ID" })
-    .refine(
-      (val) => {
-        if (!val.includes("@")) return true;
-        return z.email().safeParse(val).success;
-      },
-      { message: "Enter a valid email address" }
-    ),
-  password: z
-    .string()
-    .min(1, { message: "Enter your password" })
-    .min(8, { message: "Password must be at least 8 characters" }),
-});
-
-export type LoginFormValues = z.infer<typeof loginSchema>;
 
 const inputClassName = cn(
   "rounded-lg border-[#D1D5DB] bg-white text-sm text-[#334155]",
@@ -52,6 +37,7 @@ const labelClassName =
 
 export function LoginForm() {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<LoginFormValues>({
@@ -62,8 +48,19 @@ export function LoginForm() {
     },
   });
 
-  function onSubmit() {
-    router.push("/dashboard");
+  function onSubmit(values: LoginFormValues) {
+    startTransition(async () => {
+      const result = await loginAction(values);
+
+      if (!result.success) {
+        toast.error(result.message);
+        return;
+      }
+
+      toast.success(result.message);
+      router.replace("/dashboard");
+      router.refresh();
+    });
   }
 
   return (
@@ -155,9 +152,10 @@ export function LoginForm() {
 
             <Button
               className="h-12 w-full rounded-xl bg-[#6633FF] text-base leading-[150%] font-semibold text-white hover:bg-[#6633FF]/90 focus-visible:ring-[#6633FF]/40 dark:text-white"
+              disabled={isPending}
               type="submit"
             >
-              Sign In
+              {isPending ? "Signing In..." : "Sign In"}
             </Button>
           </form>
         </Form>

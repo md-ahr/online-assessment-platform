@@ -1,8 +1,8 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ONLINE_TESTS } from "@/lib/data/online-tests";
+import type { OnlineTestDashboardItem } from "@/lib/db/types";
 import { cn } from "@/lib/utils";
 
 import { Search } from "../../svg";
@@ -26,27 +26,72 @@ import { OnlineTestCard } from "./online-test-card";
 
 const PAGE_SIZE_OPTIONS = [4, 8, 16] as const;
 
-export function OnlineTestsDashboard() {
-  const router = useRouter();
-  const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<number>(8);
+type OnlineTestsDashboardProps = Readonly<{
+  items: readonly OnlineTestDashboardItem[];
+  page: number;
+  pageSize: number;
+  query: string;
+  total: number;
+  totalPages: number;
+}>;
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return [...ONLINE_TESTS];
-    return ONLINE_TESTS.filter((t) => t.title.toLowerCase().includes(q));
+export function OnlineTestsDashboard({
+  items,
+  page,
+  pageSize,
+  query,
+  total,
+  totalPages,
+}: OnlineTestsDashboardProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+  const [queryInput, setQueryInput] = useState(query);
+
+  useEffect(() => {
+    setQueryInput(query);
   }, [query]);
 
-  const total = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-
-  const safePage = Math.min(Math.max(1, page), totalPages);
+  const safePage = Math.min(Math.max(1, page), Math.max(1, totalPages));
   const start = (safePage - 1) * pageSize;
-  const pageItems = filtered.slice(start, start + pageSize);
 
   const showingFrom = total === 0 ? 0 : start + 1;
   const showingTo = Math.min(start + pageSize, total);
+
+  const canGoNext = safePage < totalPages;
+  const canGoPrevious = safePage > 1;
+
+  const pageSizeOptions = useMemo(
+    () => PAGE_SIZE_OPTIONS.map((option) => String(option)),
+    []
+  );
+
+  function navigateWithParams(
+    values: Readonly<{
+      page?: number;
+      pageSize?: number;
+      query?: string;
+    }>
+  ) {
+    const nextParams = new URLSearchParams(searchParams.toString());
+
+    const nextPage = values.page ?? page;
+    const nextPageSize = values.pageSize ?? pageSize;
+    const nextQuery = values.query ?? queryInput;
+
+    nextParams.set("page", String(nextPage));
+    nextParams.set("pageSize", String(nextPageSize));
+
+    if (nextQuery.trim()) {
+      nextParams.set("q", nextQuery.trim());
+    } else {
+      nextParams.delete("q");
+    }
+
+    startTransition(() => {
+      router.replace(`/dashboard?${nextParams.toString()}`);
+    });
+  }
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -65,10 +110,11 @@ export function OnlineTestsDashboard() {
                 "focus-visible:ring-[#6633FF]/30 dark:bg-background!"
               )}
               placeholder="Search by exam title"
-              value={query}
+              value={queryInput}
               onChange={(e) => {
-                setQuery(e.target.value);
-                setPage(1);
+                const nextValue = e.target.value;
+                setQueryInput(nextValue);
+                navigateWithParams({ page: 1, query: nextValue });
               }}
             />
             <div
@@ -93,8 +139,14 @@ export function OnlineTestsDashboard() {
         <DashboardEmptyState variant={query.trim() ? "search" : "catalog"} />
       ) : (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-4">
-          {pageItems.map((test) => (
-            <OnlineTestCard key={test.id} test={test} />
+          {items.map((test) => (
+            <OnlineTestCard
+              key={test.id}
+              test={test}
+              onEdit={(testId) =>
+                router.push(`/dashboard/create-online-test/${testId}`)
+              }
+            />
           ))}
         </div>
       )}
@@ -106,9 +158,11 @@ export function OnlineTestsDashboard() {
               <button
                 aria-label="Previous page"
                 className="flex size-8 items-center justify-center rounded-lg border border-[#F1F2F4] bg-white transition-colors hover:bg-muted/50 disabled:pointer-events-none disabled:opacity-40 dark:border-border dark:bg-card"
-                disabled={safePage <= 1}
+                disabled={isPending || !canGoPrevious}
                 type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                onClick={() =>
+                  navigateWithParams({ page: Math.max(1, safePage - 1) })
+                }
               >
                 <ChevronLeft aria-hidden className="size-4 text-[#A0AEC0]" />
               </button>
@@ -120,9 +174,13 @@ export function OnlineTestsDashboard() {
               <button
                 aria-label="Next page"
                 className="flex size-8 items-center justify-center rounded-lg border border-[#F1F2F4] bg-white transition-colors hover:bg-muted/50 disabled:pointer-events-none disabled:opacity-40 dark:border-border dark:bg-card"
-                disabled={safePage >= totalPages}
+                disabled={isPending || !canGoNext}
                 type="button"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() =>
+                  navigateWithParams({
+                    page: Math.min(totalPages, safePage + 1),
+                  })
+                }
               >
                 <ChevronRight
                   aria-hidden
@@ -143,8 +201,10 @@ export function OnlineTestsDashboard() {
               <Select
                 value={String(pageSize)}
                 onValueChange={(v) => {
-                  setPageSize(Number(v));
-                  setPage(1);
+                  navigateWithParams({
+                    page: 1,
+                    pageSize: Number(v),
+                  });
                 }}
               >
                 <SelectTrigger
@@ -157,9 +217,9 @@ export function OnlineTestsDashboard() {
                   <SelectPositioner>
                     <SelectPopup>
                       <SelectList>
-                        {PAGE_SIZE_OPTIONS.map((n) => (
-                          <SelectItem key={n} value={String(n)}>
-                            <SelectItemText>{n}</SelectItemText>
+                        {pageSizeOptions.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            <SelectItemText>{option}</SelectItemText>
                           </SelectItem>
                         ))}
                       </SelectList>

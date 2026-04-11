@@ -4,7 +4,9 @@ import { ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTransition } from "react";
 
+import { logoutAction } from "@/app/auth/login/actions";
 import { User } from "@/components/svg/user";
 import {
   Popover,
@@ -23,10 +25,11 @@ export function Header() {
     refId: "16101121",
   };
 
-  const isLoggedIn = true;
-
   const router = useRouter();
   const pathname = usePathname();
+  const [isLoggingOut, startTransition] = useTransition();
+
+  const isLoggedIn = !pathname.startsWith("/auth");
 
   const isOverviewPage = pathname === "/dashboard";
 
@@ -46,7 +49,7 @@ export function Header() {
           )}
         >
           <Link
-            href="/dashboard"
+            href={isLoggedIn ? "/dashboard" : "/auth/login"}
             className="relative inline-block h-8 w-[116px] shrink-0"
           >
             <Image
@@ -112,10 +115,17 @@ export function Header() {
               <PopoverContent align="end" className="w-40 gap-0 p-1">
                 <button
                   className="w-full rounded-md px-3 py-2 text-left text-sm font-medium text-[#334155] transition-colors hover:bg-accent hover:text-accent-foreground dark:text-white"
+                  disabled={isLoggingOut}
                   type="button"
-                  onClick={() => router.push("/auth/login")}
+                  onClick={() => {
+                    startTransition(async () => {
+                      await logoutAction();
+                      router.replace("/auth/login");
+                      router.refresh();
+                    });
+                  }}
                 >
-                  Logout
+                  {isLoggingOut ? "Logging out..." : "Logout"}
                 </button>
               </PopoverContent>
             </Popover>

@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 
 import { Footer, Header } from "@/components/layout";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -26,6 +27,7 @@ export default function RootLayout({
           <Header />
 
           <main className="bg-[#F7F8F9] dark:bg-background">{children}</main>
+          <Toaster position="top-center" />
 
           <Footer />
         </ThemeProvider>

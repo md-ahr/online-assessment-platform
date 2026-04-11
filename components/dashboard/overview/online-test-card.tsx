@@ -2,17 +2,21 @@ import { Clock, FileText } from "lucide-react";
 
 import { Candidates } from "@/components/svg";
 import { Button } from "@/components/ui/button";
-import type { OnlineTest } from "@/lib/data/online-tests";
+import type { OnlineTestDashboardItem } from "@/lib/db/types";
 import { cn } from "@/lib/utils";
 
 import { StatBlock } from "./stat-block";
 
-function formatStat(value: number | null): string {
-  if (value === null) return "Not Set";
+function formatStat(value: number): string {
   return value.toLocaleString("en-US");
 }
 
-export function OnlineTestCard({ test }: Readonly<{ test: OnlineTest }>) {
+type OnlineTestCardProps = Readonly<{
+  onEdit?: (testId: string) => void;
+  test: OnlineTestDashboardItem;
+}>;
+
+export function OnlineTestCard({ onEdit, test }: OnlineTestCardProps) {
   return (
     <article
       className={cn(
@@ -48,6 +52,7 @@ export function OnlineTestCard({ test }: Readonly<{ test: OnlineTest }>) {
             className="h-10 min-w-[163px] rounded-xl border border-[#6633FF] bg-transparent px-6 py-2.5 text-sm leading-[140%] font-semibold text-[#6633FF] hover:bg-[#6633FF]/8 dark:text-white dark:hover:bg-[#6633FF]/15"
             type="button"
             variant="outline"
+            onClick={() => onEdit?.(test.id)}
           >
             View Candidates
           </Button>

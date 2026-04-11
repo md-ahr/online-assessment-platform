@@ -1,6 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useTransition } from "react";
+import { toast } from "sonner";
 
 import type { CreateOnlineTestWizardProps } from "./create-online-test-wizard.types";
 import { useCreateOnlineTestWizard } from "./hooks/use-create-online-test-wizard";
@@ -11,9 +13,14 @@ import { CreateOnlineTestWizardHeader } from "./ui/create-online-test-wizard-hea
 import { QuestionsStep } from "./ui/questions-step";
 
 export function CreateOnlineTestWizard({
+  initialQuestions,
   onCancel,
+  onSubmit,
+  submitLabel,
   initialValues,
 }: CreateOnlineTestWizardProps) {
+  const [isSubmitting, startTransition] = useTransition();
+
   const {
     basicInfoView,
     closeQuestionModal,
@@ -35,8 +42,30 @@ export function CreateOnlineTestWizard({
     setQuestionModalType,
     step,
   } = useCreateOnlineTestWizard({
+    initialQuestions,
     initialValues,
   });
+
+  function handleSaveOnlineTest() {
+    if (!savedValues) {
+      return;
+    }
+
+    startTransition(async () => {
+      const result = await onSubmit({
+        basicInfo: savedValues,
+        questions,
+      });
+
+      if (!result.success) {
+        toast.error(result.message);
+        return;
+      }
+
+      toast.success(result.message);
+      onCancel();
+    });
+  }
 
   let stepContent: ReactNode;
 
@@ -60,7 +89,11 @@ export function CreateOnlineTestWizard({
   } else {
     stepContent = (
       <QuestionsStep
+        isSubmitting={isSubmitting}
         questions={questions}
+        submitLabel={submitLabel}
+        onReturnToBasicInfo={handleEditBasicInfo}
+        onSaveOnlineTest={handleSaveOnlineTest}
         onOpenAddQuestion={openAddQuestionModal}
         onRemoveQuestion={removeQuestion}
         onEditQuestion={(index, question) =>

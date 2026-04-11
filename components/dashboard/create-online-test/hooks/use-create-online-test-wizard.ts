@@ -10,10 +10,12 @@ import type {
 import type { QuestionDraft } from "../question-editor.types";
 
 type UseCreateOnlineTestWizardParams = Readonly<{
+  initialQuestions?: readonly QuestionDraft[];
   initialValues?: Partial<OnlineTestFormValues>;
 }>;
 
 export function useCreateOnlineTestWizard({
+  initialQuestions,
   initialValues,
 }: UseCreateOnlineTestWizardParams) {
   const [step, setStep] = useState<WizardStep>(1);
@@ -24,7 +26,9 @@ export function useCreateOnlineTestWizard({
     null
   );
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
-  const [questions, setQuestions] = useState<QuestionDraft[]>([]);
+  const [questions, setQuestions] = useState<QuestionDraft[]>(() => [
+    ...(initialQuestions ?? []),
+  ]);
   const [editingQuestionIndex, setEditingQuestionIndex] = useState<
     number | null
   >(null);
@@ -103,12 +107,16 @@ export function useCreateOnlineTestWizard({
     }
 
     const selectedType = savedValues?.questionType;
-    if (
-      selectedType === "Checkbox" ||
-      selectedType === "Radio" ||
-      selectedType === "Text"
-    ) {
+    if (selectedType === "Checkbox" || selectedType === "Text") {
       return selectedType;
+    }
+
+    if (selectedType === "MCQ") {
+      return "Radio";
+    }
+
+    if (selectedType === "Radio") {
+      return "Radio";
     }
 
     return "Checkbox";

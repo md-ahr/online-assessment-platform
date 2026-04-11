@@ -9,17 +9,25 @@ import {
 import type { QuestionDraft } from "../question-editor.types";
 
 type QuestionsStepProps = Readonly<{
+  isSubmitting?: boolean;
   onEditQuestion: (index: number, question: QuestionDraft) => void;
+  onSaveOnlineTest?: () => void;
   onOpenAddQuestion: () => void;
+  onReturnToBasicInfo?: () => void;
   onRemoveQuestion: (index: number) => void;
   questions: readonly QuestionDraft[];
+  submitLabel?: string;
 }>;
 
 export function QuestionsStep({
+  isSubmitting = false,
   onEditQuestion,
+  onReturnToBasicInfo,
+  onSaveOnlineTest,
   onOpenAddQuestion,
   onRemoveQuestion,
   questions,
+  submitLabel = "Save Online Test",
 }: QuestionsStepProps) {
   return (
     <div className="flex w-full max-w-[954px] flex-col gap-6">
@@ -116,13 +124,38 @@ export function QuestionsStep({
       ))}
 
       <div className="w-full rounded-2xl bg-card p-6">
-        <Button
-          className="h-14 w-full rounded-xl text-base leading-[150%] font-semibold text-white dark:text-white"
-          type="button"
-          onClick={onOpenAddQuestion}
+        <div
+          className={cn(
+            "grid grid-cols-1 gap-4 md:grid-cols-3",
+            questions?.length > 0 ? "md:grid-cols-3" : "md:grid-cols-2"
+          )}
         >
-          Add Question
-        </Button>
+          <Button
+            className="h-14 w-full rounded-xl border border-border bg-transparent text-base leading-[150%] font-semibold text-secondary hover:bg-muted/40 dark:text-foreground"
+            type="button"
+            variant="outline"
+            onClick={onReturnToBasicInfo}
+          >
+            Back to Basic Info
+          </Button>
+          <Button
+            className="h-14 w-full rounded-xl text-base leading-[150%] font-semibold text-white dark:text-white"
+            type="button"
+            onClick={onOpenAddQuestion}
+          >
+            Add Question
+          </Button>
+          {questions?.length > 0 && (
+            <Button
+              className="h-14 w-full rounded-xl bg-green-500 text-base leading-[150%] font-semibold text-white hover:bg-green-600 dark:text-white"
+              disabled={isSubmitting || questions.length === 0}
+              type="button"
+              onClick={onSaveOnlineTest}
+            >
+              {isSubmitting ? "Saving..." : submitLabel}
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

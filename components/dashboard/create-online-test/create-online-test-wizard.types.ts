@@ -16,8 +16,17 @@ export type BasicInfoView = "form" | "summary";
 export type QuestionModalType = QuestionType;
 
 export type CreateOnlineTestWizardProps = Readonly<{
+  initialQuestions?: readonly QuestionDraft[];
   onCancel: () => void;
+  onSubmit: (payload: {
+    basicInfo: OnlineTestFormValues;
+    questions: readonly QuestionDraft[];
+  }) => Promise<{
+    message: string;
+    success: boolean;
+  }>;
   initialValues?: Partial<OnlineTestFormValues>;
+  submitLabel?: string;
 }>;
 
 export type QuestionSaveParams = Readonly<{
