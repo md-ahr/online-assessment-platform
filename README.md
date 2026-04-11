@@ -1,5 +1,7 @@
 # Online Assessment Platform
 
+**Live:** [https://ibos-assessment-platform.vercel.app/](https://ibos-assessment-platform.vercel.app/)
+
 A full-stack **Next.js** application for employers to create and manage online tests and for candidates to browse assessments, take timed exams (MCQ, multi-select, and written questions), and view completion or timeout flows. Authentication uses **JWT** sessions in **httpOnly** cookies; data lives in **MongoDB** via **Mongoose**.
 
 ---
