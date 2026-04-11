@@ -15,6 +15,8 @@ import { cn } from "@/lib/utils";
 import LogoImage from "@/public/images/logo.webp";
 import LogoWhiteImage from "@/public/images/logo-white.webp";
 
+import { ThemeSwitcher } from "./theme-switcher";
+
 export function Header() {
   const user = {
     name: "John Doe",
@@ -77,6 +79,7 @@ export function Header() {
 
         {isLoggedIn && (
           <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+            <ThemeSwitcher />
             <Popover>
               <PopoverTrigger
                 className={cn(

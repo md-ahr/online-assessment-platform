@@ -2,7 +2,7 @@ import { Clock, FileText } from "lucide-react";
 
 import { Candidates } from "@/components/svg";
 import { Button } from "@/components/ui/button";
-import { OnlineTest } from "@/lib/data/online-tests";
+import type { OnlineTest } from "@/lib/data/online-tests";
 import { cn } from "@/lib/utils";
 
 import { StatBlock } from "./stat-block";
@@ -45,7 +45,7 @@ export function OnlineTestCard({ test }: Readonly<{ test: OnlineTest }>) {
         </div>
         <div className="flex flex-wrap items-center gap-4">
           <Button
-            className="h-10 min-w-[163px] rounded-xl border border-[#6633FF] bg-transparent px-6 py-2.5 text-sm leading-[140%] font-semibold text-[#6633FF] hover:bg-[#6633FF]/8 dark:hover:bg-[#6633FF]/15"
+            className="h-10 min-w-[163px] rounded-xl border border-[#6633FF] bg-transparent px-6 py-2.5 text-sm leading-[140%] font-semibold text-[#6633FF] hover:bg-[#6633FF]/8 dark:text-white dark:hover:bg-[#6633FF]/15"
             type="button"
             variant="outline"
           >
