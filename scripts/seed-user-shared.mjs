@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
+    name: { type: String, required: true, trim: true },
     email: {
       type: String,
       required: true,
@@ -25,10 +26,11 @@ const userSchema = new mongoose.Schema(
 const UserModel = mongoose.models.User ?? mongoose.model("User", userSchema);
 
 /**
- * @param {{ mongoUri: string; email: string; password: string; userId: string; role: "employer" | "candidate" }} params
+ * @param {{ mongoUri: string; name: string; email: string; password: string; userId: string; role: "employer" | "candidate" }} params
  */
 export async function upsertSeedUser({
   mongoUri,
+  name,
   email,
   password,
   userId,
@@ -41,7 +43,7 @@ export async function upsertSeedUser({
 
     await UserModel.updateOne(
       { $or: [{ email }, { userId }] },
-      { $set: { email, passwordHash, role, userId } },
+      { $set: { name, email, passwordHash, role, userId } },
       { upsert: true }
     );
   } finally {

@@ -22,6 +22,7 @@ describe("jwt helpers", () => {
     const token = await createSessionToken(
       {
         email: "employer@example.com",
+        name: "IBOS Limited",
         role: "employer",
         userId: "507f1f77bcf86cd799439011",
         username: "EMP001",
@@ -33,6 +34,7 @@ describe("jwt helpers", () => {
 
     expect(payload).toEqual({
       email: "employer@example.com",
+      name: "IBOS Limited",
       role: "employer",
       userId: "507f1f77bcf86cd799439011",
       username: "EMP001",

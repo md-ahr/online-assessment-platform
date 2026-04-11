@@ -15,6 +15,27 @@ export type QuestionDTO = Readonly<{
   options: readonly QuestionOptionDTO[];
 }>;
 
+/** Candidate-facing question payload (correct answers are never exposed). */
+export type CandidateQuestionOptionDTO = Readonly<{
+  id: string;
+  label: string;
+  content: string;
+}>;
+
+export type CandidateQuestionDTO = Readonly<{
+  prompt: string;
+  questionType: QuestionType;
+  score: number;
+  options: readonly CandidateQuestionOptionDTO[];
+}>;
+
+export type CandidateOnlineTestSession = Readonly<{
+  testId: string;
+  title: string;
+  durationMinutes: number | null;
+  questions: readonly CandidateQuestionDTO[];
+}>;
+
 export type OnlineTestQuestionPreference = "MCQ" | "Checkbox" | "Text";
 
 export type OnlineTestDashboardItem = Readonly<{
@@ -49,7 +70,11 @@ export type OnlineTestMutationInput = Readonly<{
 
 export type AuthenticatedUser = Readonly<{
   role: UserRole;
+  /** MongoDB document id (subject of the session JWT). */
   userId: string;
   email: string;
+  /** Business user id from the User document (e.g. EMP001). */
   username: string;
+  /** Display name from the User document. */
+  name: string;
 }>;

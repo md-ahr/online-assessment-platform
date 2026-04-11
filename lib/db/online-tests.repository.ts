@@ -3,6 +3,8 @@ import "server-only";
 import { Types } from "mongoose";
 
 import type {
+  CandidateOnlineTestSession,
+  CandidateQuestionDTO,
   OnlineTestCandidateListItem,
   OnlineTestDashboardItem,
   OnlineTestMutationInput,
@@ -198,6 +200,71 @@ export async function getOnlineTestTitleById(
     .lean();
 
   return record?.title ?? null;
+}
+
+export type CandidateTestCompletionMeta = Readonly<{
+  title: string;
+  questionType: "MCQ" | "Checkbox" | "Text";
+}>;
+
+export async function getOnlineTestCandidateCompletionMeta(
+  testId: string
+): Promise<CandidateTestCompletionMeta | null> {
+  await connectToDatabase();
+
+  if (!Types.ObjectId.isValid(testId)) {
+    return null;
+  }
+
+  const record = await OnlineTestModel.findById(toObjectId(testId))
+    .select({ questionType: 1, title: 1 })
+    .lean();
+
+  if (!record) {
+    return null;
+  }
+
+  return {
+    questionType: record.questionType,
+    title: record.title,
+  };
+}
+
+export async function getOnlineTestForCandidateSession(
+  testId: string
+): Promise<CandidateOnlineTestSession | null> {
+  await connectToDatabase();
+
+  if (!Types.ObjectId.isValid(testId)) {
+    return null;
+  }
+
+  const record = await OnlineTestModel.findById(toObjectId(testId))
+    .select({ durationMinutes: 1, questions: 1, title: 1 })
+    .lean();
+
+  if (!record) {
+    return null;
+  }
+
+  const rawQuestions = record.questions ?? [];
+  const questions: CandidateQuestionDTO[] = rawQuestions.map((question) => ({
+    options: (question.options ?? []).map((option) => ({
+      content: option.content,
+      id: option.id,
+      label: option.label,
+    })),
+    prompt: question.prompt,
+    questionType: question.questionType,
+    score: question.score,
+  }));
+
+  return {
+    durationMinutes: record.durationMinutes ?? null,
+    questions,
+    testId: record._id.toString(),
+    title: record.title,
+  };
 }
 
 export async function createOnlineTest(

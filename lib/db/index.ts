@@ -5,6 +5,8 @@ export {
   createOnlineTest,
   deleteOnlineTest,
   getOnlineTestById,
+  getOnlineTestCandidateCompletionMeta,
+  getOnlineTestForCandidateSession,
   getOnlineTestTitleById,
   listOnlineTests,
   listOnlineTestsForCandidates,

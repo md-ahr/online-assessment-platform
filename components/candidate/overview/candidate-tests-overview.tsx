@@ -1,10 +1,11 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 
 import { DashboardEmptyState } from "@/components/dashboard/overview/empty-state";
+import { Search } from "@/components/svg";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -110,15 +111,12 @@ export function CandidateTestsOverview({
               navigateWithParams({ page: 1, query: nextValue });
             }}
           />
-          <button
-            aria-label="Search exams"
-            className="absolute top-1/2 right-2 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-[#6633FF] text-white shadow-sm transition-colors hover:bg-[#6633FF]/90 disabled:opacity-50"
-            disabled={isPending}
-            type="button"
-            onClick={() => navigateWithParams({ page: 1 })}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute top-1/2 right-3 z-10 -translate-y-1/2"
           >
-            <Search aria-hidden className="size-4" strokeWidth={2.25} />
-          </button>
+            <Search />
+          </div>
         </div>
       </div>
 

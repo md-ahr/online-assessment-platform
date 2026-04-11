@@ -13,6 +13,7 @@ export async function createSessionToken(
 ): Promise<string> {
   return new SignJWT({
     email: payload.email,
+    name: payload.name,
     role: payload.role,
     username: payload.username,
   })
@@ -40,8 +41,14 @@ export async function verifySessionToken(
       return null;
     }
 
+    const name =
+      typeof payload.name === "string" && payload.name.trim() !== ""
+        ? payload.name.trim()
+        : payload.username;
+
     return {
       email: payload.email,
+      name,
       role: payload.role,
       userId: payload.sub,
       username: payload.username,

@@ -69,8 +69,14 @@ export async function loginAction(
     };
   }
 
+  const displayName =
+    typeof user.name === "string" && user.name.trim() !== ""
+      ? user.name.trim()
+      : user.userId;
+
   await setSessionCookie({
     email: user.email,
+    name: displayName,
     role: user.role,
     userId: user._id.toString(),
     username: user.userId,
