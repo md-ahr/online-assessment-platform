@@ -90,14 +90,14 @@ export function ThemeSwitcher() {
       : "system";
 
   return (
-    <div className="w-[112px]">
+    <div className="w-[min(100%,5.75rem)] shrink-0 sm:w-[112px]">
       <Select
         value={selectedTheme}
         onValueChange={(value) => setTheme(value as ThemeOption)}
       >
         <SelectTrigger
           aria-label="Select theme"
-          className="h-10 min-h-10 rounded-xl px-2.5 text-sm"
+          className="h-10 min-h-10 rounded-xl px-1.5 text-xs sm:px-2.5 sm:text-sm"
         >
           <span className="inline-flex items-center gap-2">
             <ThemeOptionIcon theme={selectedTheme} />

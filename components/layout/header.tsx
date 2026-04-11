@@ -24,6 +24,30 @@ type HeaderProps = Readonly<{
   session: AuthenticatedUser | null;
 }>;
 
+function HeaderLogoLink({ href }: Readonly<{ href: string }>) {
+  return (
+    <Link href={href} className="relative inline-block h-8 w-[116px] shrink-0">
+      <Image
+        src={LogoImage}
+        alt="AKIJ RESOURCE"
+        width={116}
+        height={32}
+        className="dark:hidden"
+        priority
+      />
+      <Image
+        src={LogoWhiteImage}
+        alt=""
+        width={116}
+        height={32}
+        aria-hidden
+        className="hidden dark:block"
+        priority
+      />
+    </Link>
+  );
+}
+
 export function Header({ session }: HeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -55,58 +79,9 @@ export function Header({ session }: HeaderProps) {
       )}
     >
       <div className="container-wrapper flex h-20 min-h-20 w-full items-center gap-2 sm:gap-4">
-        {!isLoggedIn ? (
+        {isLoggedIn ? (
           <>
-            <Link
-              href={homeHref}
-              className="relative inline-block h-8 w-[116px] shrink-0"
-            >
-              <Image
-                src={LogoImage}
-                alt="AKIJ RESOURCE"
-                width={116}
-                height={32}
-                className="dark:hidden"
-                priority
-              />
-              <Image
-                src={LogoWhiteImage}
-                alt=""
-                width={116}
-                height={32}
-                aria-hidden
-                className="hidden dark:block"
-                priority
-              />
-            </Link>
-            <h1 className="title min-w-0 flex-1 px-2 text-center">
-              Akij Resource
-            </h1>
-          </>
-        ) : (
-          <>
-            <Link
-              href={homeHref}
-              className="relative inline-block h-8 w-[116px] shrink-0"
-            >
-              <Image
-                src={LogoImage}
-                alt="AKIJ RESOURCE"
-                width={116}
-                height={32}
-                className="dark:hidden"
-                priority
-              />
-              <Image
-                src={LogoWhiteImage}
-                alt=""
-                width={116}
-                height={32}
-                aria-hidden
-                className="hidden dark:block"
-                priority
-              />
-            </Link>
+            <HeaderLogoLink href={homeHref} />
             <nav
               aria-label="Main"
               className="flex min-w-0 flex-1 items-center justify-center px-1 sm:justify-start sm:pl-2"
@@ -138,7 +113,6 @@ export function Header({ session }: HeaderProps) {
                       </span>
                       <span
                         className="max-w-40 truncate text-xs leading-[150%] font-medium text-[#64748B] dark:text-white/55"
-                        id={session.username}
                         title={`User ID: ${session.username}`}
                       >
                         Ref. ID - {session.username}
@@ -160,7 +134,8 @@ export function Header({ session }: HeaderProps) {
                     </p>
                     <p
                       className="mt-1 truncate text-xs leading-[150%] font-medium text-[#64748B] dark:text-muted-foreground"
-                      id="user-menu-ref-id"
+                      id={session.username}
+                      title={`User ID: ${session.username}`}
                     >
                       Ref. ID - {session.username}
                     </p>
@@ -184,6 +159,13 @@ export function Header({ session }: HeaderProps) {
                 </PopoverContent>
               </Popover>
             </div>
+          </>
+        ) : (
+          <>
+            <HeaderLogoLink href={homeHref} />
+            <h1 className="title min-w-0 flex-1 px-2 text-center">
+              Akij Resource
+            </h1>
           </>
         )}
       </div>
