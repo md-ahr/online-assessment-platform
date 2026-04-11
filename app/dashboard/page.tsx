@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <section className="container-wrapper py-8 pb-12 dark:bg-background">
+    <section className="container-wrapper min-h-[calc(100vh-161px)] py-8 pb-12 dark:bg-background">
       <OnlineTestsDashboard />
     </section>
   );

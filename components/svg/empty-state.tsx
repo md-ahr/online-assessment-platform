@@ -1,5 +1,3 @@
-"use client";
-
 import { type SVGProps, useId } from "react";
 
 export function EmptyState({

@@ -49,7 +49,7 @@ export function OnlineTestsDashboard() {
   const showingTo = Math.min(start + pageSize, total);
 
   return (
-    <div className="flex min-h-[calc(100vh-241px)] w-full flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-5">
         <h1 className="shrink-0 text-2xl leading-[130%] font-semibold text-[#334155] dark:text-foreground">
           Online Tests

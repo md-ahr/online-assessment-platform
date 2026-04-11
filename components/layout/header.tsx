@@ -1,8 +1,16 @@
+"use client";
+
 import { ChevronDown } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 import { User } from "@/components/svg/user";
-import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import LogoImage from "@/public/images/logo.webp";
 import LogoWhiteImage from "@/public/images/logo-white.webp";
@@ -14,6 +22,11 @@ export function Header() {
   };
 
   const isLoggedIn = true;
+
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const isOverviewPage = pathname === "/dashboard";
 
   return (
     <header
@@ -30,7 +43,10 @@ export function Header() {
             isLoggedIn ? "gap-8 md:gap-16 lg:gap-25" : ""
           )}
         >
-          <span className="relative inline-block h-8 w-[116px] shrink-0">
+          <Link
+            href="/dashboard"
+            className="relative inline-block h-8 w-[116px] shrink-0"
+          >
             <Image
               src={LogoImage}
               alt="AKIJ RESOURCE"
@@ -48,44 +64,58 @@ export function Header() {
               className="hidden dark:block"
               priority
             />
-          </span>
+          </Link>
 
-          <nav aria-label="Main">{isLoggedIn && <p>Dashboard</p>}</nav>
+          <nav aria-label="Main">
+            {isLoggedIn && (
+              <p>{isOverviewPage ? "Dashboard" : "Online Test"}</p>
+            )}
+          </nav>
         </div>
 
         {!isLoggedIn && <h1 className="title mx-auto">Akij Resource</h1>}
 
         {isLoggedIn && (
           <div className="flex shrink-0 items-center gap-2 sm:gap-4">
-            <Button
-              className={cn(
-                "h-auto max-w-[min(100vw-8rem,172px)] gap-2 rounded-full py-1.5 pr-2 pl-2",
-                "text-foreground hover:bg-black/4",
-                "dark:text-white/95 dark:hover:bg-white/8",
-                "dark:focus-visible:ring-white/30"
-              )}
-              type="button"
-              variant="ghost"
-            >
-              <User
-                aria-hidden
-                className="size-10 shrink-0 dark:rounded-full dark:ring-1 dark:ring-white/15 dark:ring-offset-0"
-                height={40}
-                width={40}
-              />
-              <span className="hidden min-w-0 flex-col items-start text-left sm:flex">
-                <span className="max-w-40 truncate text-sm leading-[140%] font-semibold text-[#334155] dark:text-white">
-                  {user.name}
-                </span>
-                <span className="max-w-40 truncate text-xs leading-[150%] font-medium text-[#64748B] dark:text-white/55">
-                  Ref. ID - {user.refId}
-                </span>
-              </span>
-              <ChevronDown
-                aria-hidden
-                className="size-4 shrink-0 text-[#4B5563] dark:text-white/70"
-              />
-            </Button>
+            <Popover>
+              <PopoverTrigger
+                className={cn(
+                  "inline-flex h-auto max-w-[min(100vw-8rem,172px)] items-center gap-2 rounded-full px-2 py-1.5",
+                  "text-foreground hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none",
+                  "dark:text-white/95 dark:focus-visible:ring-white/30"
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <User
+                    aria-hidden
+                    className="size-10 shrink-0 dark:rounded-full dark:ring-1 dark:ring-white/15 dark:ring-offset-0"
+                    height={40}
+                    width={40}
+                  />
+                  <p className="hidden min-w-0 flex-col items-start text-left sm:flex">
+                    <span className="max-w-40 truncate text-sm leading-[140%] font-semibold text-[#334155] dark:text-white">
+                      {user.name}
+                    </span>
+                    <span className="max-w-40 truncate text-xs leading-[150%] font-medium text-[#64748B] dark:text-white/55">
+                      Ref. ID - {user.refId}
+                    </span>
+                  </p>
+                </div>
+                <ChevronDown
+                  aria-hidden
+                  className="size-5 shrink-0 text-[#4B5563] dark:text-white/70"
+                />
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-40 gap-0 p-1">
+                <button
+                  className="w-full rounded-md px-3 py-2 text-left text-sm font-medium text-[#334155] transition-colors hover:bg-accent hover:text-accent-foreground dark:text-white"
+                  type="button"
+                  onClick={() => router.push("/auth/login")}
+                >
+                  Logout
+                </button>
+              </PopoverContent>
+            </Popover>
           </div>
         )}
       </div>

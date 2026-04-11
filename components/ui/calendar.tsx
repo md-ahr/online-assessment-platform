@@ -10,36 +10,33 @@ export type CalendarProps = ComponentProps<typeof DayPicker>;
 function Calendar({ className, ...props }: Readonly<CalendarProps>) {
   return (
     <DayPicker
-      className={cn(
-        "w-full rounded-xl border bg-card p-4 [--cell-size:2.5rem]",
-        className
-      )}
+      className={cn("w-full rounded-xl bg-card p-3", className)}
       classNames={{
-        root: "rdp-root relative w-full",
-        months: "flex flex-col items-center gap-2",
-        month: "relative w-full pt-10",
-        caption:
-          "absolute inset-x-0 top-0 flex h-10 items-center justify-center",
+        root: "rdp-root w-full",
+        months: "flex w-full flex-col",
+        month: "w-full space-y-3",
+        caption: "relative flex h-9 items-center justify-center",
         caption_label:
-          "text-[1.75rem] leading-none font-semibold text-foreground",
-        nav: "absolute inset-x-0 top-0 flex h-10 items-center justify-between px-1.5",
-        nav_button:
-          "h-8 w-8 rounded-md bg-transparent p-0 text-foreground hover:bg-accent/40",
-        table: "mx-auto mt-2 border-collapse space-y-1",
-        head_row: "flex",
-        head_cell:
-          "w-(--cell-size) rounded-md text-center text-base font-normal text-muted-foreground",
-        row: "mt-2 flex w-full justify-center",
-        cell: "h-(--cell-size) w-(--cell-size) p-0 text-center",
-        day: "h-(--cell-size) w-(--cell-size) rounded-md p-0 text-xl font-medium text-foreground hover:bg-accent hover:text-accent-foreground",
-        day_selected:
-          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
-        day_today: "ring-1 ring-border",
-        day_outside: "text-muted-foreground opacity-50",
-        day_disabled: "text-muted-foreground opacity-50",
-        day_range_middle:
-          "aria-selected:bg-accent aria-selected:text-accent-foreground",
-        day_hidden: "invisible",
+          "text-lg font-semibold text-foreground text-center block",
+        nav: "absolute inset-x-0 top- left-2 right-2 flex items-center justify-between",
+        button_previous:
+          "inline-flex size-6 items-center justify-center rounded-md border border-transparent text-foreground transition-colors hover:bg-accent/50",
+        button_next:
+          "inline-flex size-6 items-center justify-center rounded-md border border-transparent text-foreground transition-colors hover:bg-accent/50",
+        month_grid: "w-full border-collapse",
+        weekdays: "grid grid-cols-7",
+        weekday:
+          "h-8 text-center text-sm font-semibold tracking-tight text-foreground/90",
+        week: "mt-1 grid grid-cols-7",
+        day: "flex items-center justify-center p-0",
+        day_button:
+          "flex size-9 items-center justify-center rounded-lg text-base font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
+        selected:
+          "[&>button]:bg-primary [&>button]:text-primary-foreground [&>button]:hover:bg-primary",
+        today: "[&>button]:ring-1 [&>button]:ring-primary/35",
+        outside: "text-muted-foreground opacity-45",
+        disabled: "text-muted-foreground opacity-45",
+        hidden: "invisible",
       }}
       {...props}
     />

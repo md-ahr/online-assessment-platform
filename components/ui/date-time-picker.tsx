@@ -1,8 +1,8 @@
 "use client";
 
 import { format } from "date-fns";
-import { Clock3 } from "lucide-react";
-import { useMemo } from "react";
+import { CalendarDays, Clock3 } from "lucide-react";
+import { useId, useMemo } from "react";
 
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
@@ -69,10 +69,13 @@ export function DateTimePicker({
   "aria-describedby": ariaDescribedBy,
   "aria-invalid": ariaInvalid,
 }: DateTimePickerProps) {
+  const fallbackId = useId();
+  const timeInputId = `${id ?? fallbackId}-time`;
   const selectedDate = useMemo(() => parseDateTimeValue(value), [value]);
   const displayValue = selectedDate
     ? format(selectedDate, "dd MMM yyyy, hh:mm a")
     : placeholder;
+  const timeValue = selectedDate ? format(selectedDate, "HH:mm") : "";
 
   return (
     <Popover>
@@ -92,12 +95,15 @@ export function DateTimePicker({
         >
           {displayValue}
         </span>
-        <Clock3 aria-hidden className="size-4 shrink-0 text-[#9CA3AF]" />
+        <CalendarDays aria-hidden className="size-4 shrink-0 text-[#9CA3AF]" />
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-(--anchor-width) p-3">
-        <div className="flex flex-col gap-3">
+      <PopoverContent
+        align="start"
+        className="w-(--anchor-width) max-w-[calc(100vw-2rem)] min-w-[320px] overflow-hidden p-0"
+      >
+        <div className="flex flex-col">
           <Calendar
-            className="w-full"
+            className="w-full rounded-none border-0 p-4 pb-3"
             mode="single"
             selected={selectedDate ?? undefined}
             onSelect={(selected) => {
@@ -108,23 +114,43 @@ export function DateTimePicker({
               onChange(mergeDateWithExistingTime(selected, value));
             }}
           />
-          <div className="relative">
+          <div className="space-y-2 border-t border-border px-4 py-3">
+            <label
+              htmlFor={timeInputId}
+              className="flex items-center gap-2 text-xs font-medium text-muted-foreground"
+            >
+              <Clock3 aria-hidden className="size-3.5" />
+              Time
+            </label>
             <Input
+              id={timeInputId}
+              className="h-10"
               type="time"
-              value={selectedDate ? format(selectedDate, "HH:mm") : ""}
+              value={timeValue}
+              disabled={!selectedDate}
               onChange={(event) => {
                 if (!event.target.value) {
                   onChange("");
                   return;
                 }
+
+                if (!selectedDate) {
+                  return;
+                }
+
                 const [hours = "09", minutes = "00"] =
                   event.target.value.split(":");
-                const base = selectedDate ? new Date(selectedDate) : new Date();
+                const base = new Date(selectedDate);
 
                 base.setHours(Number(hours), Number(minutes), 0, 0);
                 onChange(toDateTimeLocalValue(base));
               }}
             />
+            {selectedDate ? null : (
+              <p className="text-xs text-muted-foreground">
+                Select a date first, then set the time.
+              </p>
+            )}
           </div>
         </div>
       </PopoverContent>

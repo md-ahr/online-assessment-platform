@@ -67,7 +67,7 @@ function SelectPopup({
   return (
     <SelectPrimitive.Popup
       className={cn(
-        "origin(--transform-origin) max-h-[min(var(--available-height),20rem)] overflow-y-auto rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-md",
+        "origin(--transform-origin) max-h-[min(var(--available-height),20rem)] w-(--anchor-width) overflow-y-auto rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-md",
         className
       )}
       {...props}
